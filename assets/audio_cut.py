@@ -60,8 +60,8 @@ def main():
             counts[k] = counts.get(k, 0) + 1
             name = f"{k}_{counts[k]}"
             fo = max(.03, min(.25, (b0 - a0) * .2))
-            subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", src, "-ss", f"{a0:.3f}", "-to", f"{b0:.3f}",
-                            "-af", f"volume={gain:.2f}dB,afade=t=in:d=0.01,afade=t=out:st={b0-a0-fo:.3f}:d={fo:.3f}",
+            subprocess.run(["ffmpeg", "-y", "-v", "error", "-i", src,
+                            "-af", f"atrim=start={a0:.3f}:end={b0:.3f},asetpts=PTS-STARTPTS,volume={gain:.2f}dB,afade=t=in:d=0.01,afade=t=out:st={b0-a0-fo:.3f}:d={fo:.3f}",
                             "-ac", "1", "-ar", "44100", "-c:a", "libmp3lame", "-q:a", "4", f"{out}/{name}.mp3"], check=True)
             manifest.setdefault(k, []).append(name)
     json.dump(manifest, open("blobs/audio_manifest.json", "w"), indent=0)

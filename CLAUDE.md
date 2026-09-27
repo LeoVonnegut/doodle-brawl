@@ -8,12 +8,12 @@
 - Hate moving files around. GitHub is the source of truth.
 - Start a new chat per feature/batch; batch fixes after play sessions.
 
-## Current state (v1.1)
+## Current state (v1.2)
 - Live at https://leovonnegut.github.io/doodle-brawl/ (GitHub Pages from main, file index.html).
-- Single HTML file. Stick figures, notebook paper, googly eyes all drawn in code; sounds synthesized in code.
+- Single HTML file + assets/. All canvas art is traced from the user's drawings (assets/img, pipeline: assets/crops.py, font.py, font_build.py); canvas text uses the handwriting bitmap font. All sounds are the user's voice memos (assets/audio, 117 clips cut by memo name + list order via assets/audio_cut.py; raw memos in gitignored assets/raw). Notebook paper lines and lobby/DOM text are still code/web font.
 - Multiplayer via PeerJS: "Just play" (no code, first to click hosts, host relays) or private 5-letter code, with automatic reconnect if host leaves. Each player sends own state ~30x/sec; shooter decides hits, victim applies damage. Ping between Tbilisi/Dubai ~60-150ms, worked fine.
 - Rounds (first to 5 bonks), leader crown, 1.5s spawn protection, kill feed, T taunt, random hats, squash and stretch, screen wraparound, moving platform, controller support, unique player colors, version check/mismatch warning.
-- Guns now: Pea Shooter, Shotty, Brrrt-o-matic (minigun), Boomstick (rocket), Banana Bomb, Honk Cannon. Built for 4 players (6 max).
+- Guns now: Pea Shooter, Shotty, Brrrt-o-matic (minigun), Assault Rifle (3-shot bursts), Sniper (shots pierce platforms), Boomstick (rocket), Banana Bomb, Honk Cannon (no drawing/recording; uses pitched shotgun sound). AR reuses the sniper drawing, shorter (no separate AR drawing found). Built for 4 players (6 max).
 
 ## History
 1. First version used claude.ai's built-in multiplayer — failed for friend (needs a Claude Team account).

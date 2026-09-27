@@ -68,7 +68,7 @@ let myColor=Math.random()*COLORS.length|0;const myHat=Math.random()*4|0;
 const PLAT=[[0,470,300,70],[660,470,300,70],[110,360,150,14],[700,360,150,14],[395,275,170,14],[40,200,120,14],[800,200,120,14],[330,140,110,14],[520,140,110,14]];
 function movX(){return 425+Math.sin(Date.now()/1700)*155}
 function allPlats(){return PLAT.concat([[movX(),440,110,14]])}
-const TARGET=5;const VERSION='1.1';
+const TARGET=5;const VERSION='1.2';
 const VERBS=['bonked','yeeted','deleted','honked','spaghettified','bamboozled','sent to the shadow realm'];
 const SPAWNS=[[90,120],[870,120],[480,200],[210,320],[740,320]];
 const CRATES=[[480,255],[100,180],[860,180],[185,340],[775,340],[385,120],[575,120]];
@@ -78,14 +78,16 @@ const GUNS={
  m:{name:'Brrrt-o-matic',cd:75,spd:15,dmg:6,kb:1.6,spread:.09,ammo:45,life:70,snd:'brrt',rec:.6},
  r:{name:'Boomstick',cd:850,spd:8.5,dmg:48,kb:15,ammo:4,life:120,boom:80,snd:'rocket',rec:3,grav:.05},
  b:{name:'Banana Bomb',cd:650,spd:9,dmg:42,kb:13,ammo:3,life:95,boom:78,snd:'toss',rec:1,grav:.35,bounce:true},
- h:{name:'Honk Cannon',cd:600,spd:14,dmg:3,kb:15,pel:5,spread:.25,ammo:5,life:13,snd:'honk',rec:6}
+ h:{name:'Honk Cannon',cd:600,spd:14,dmg:3,kb:15,pel:5,spread:.25,ammo:5,life:13,snd:'honk',rec:6},
+ a:{name:'Assault Rifle',cd:520,burst:3,bgap:70,spd:16,dmg:10,kb:2.2,spread:.04,ammo:30,life:70,snd:'ar',rec:.8},
+ n:{name:'Sniper',cd:1300,spd:22,dmg:70,kb:10,ammo:5,life:65,snd:'sniper',rec:5,pierce:true}
 };
 const QUIPS=['BONK!','OOF','yeet','ouchie','splat!','KAPOW','bye!','noooo'];
 
 // ---------- sound ----------
 const SND={fight:3,win:4,join:6,pick:3,ammo:3,jump:3,jump2:3,land:3,boom_r:3,boom_b:3,hit:9,die:16,fall:6,taunt:31,pew:3,shot:3,brrt:3,ar:3,sniper:3,rocket:3,toss:3};
 const VOL={pew:.55,shot:.6,brrt:.5,ar:.55,sniper:.7,rocket:.7,toss:.6,honk:.6,boom_r:.9,boom_b:.9,hit:.7,die:.8,fall:.8,jump:.45,jump2:.45,land:.4,pick:.7,ammo:.7,taunt:1,fight:1,win:.9,join:.8};
-const ALIAS={honk:['shot',1.45]},HOLD={brrt:1};
+const ALIAS={honk:['shot',1.45]},HOLD={brrt:1,ar:1};
 let ac=null;const BUF={},RAW={},busy={};
 for(const k in SND)for(let i=1;i<=SND[k];i++){const n=k+'_'+i;RAW[n]=fetch('assets/audio/'+n+'.mp3').then(r=>r.ok?r.arrayBuffer():null).catch(()=>null)}
 function audio(){if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)();for(const n in RAW)RAW[n].then(b=>b&&new Promise((ok,no)=>ac.decodeAudioData(b,ok,no))).then(d=>{if(d)BUF[n]=d}).catch(()=>{})}catch(e){}}if(ac&&ac.state==='suspended')ac.resume()}
@@ -95,7 +97,7 @@ function sfx(key,far,idx){if(!ac)return -1;const al=ALIAS[key],k=al?al[0]:key,ra
   const s=ac.createBufferSource(),g=ac.createGain();s.buffer=buf;s.playbackRate.value=rate;g.gain.value=(VOL[key]||.7)*(far?.5:1);s.connect(g).connect(ac.destination);s.start();
   busy[k]=now+buf.duration/rate-.05;return i}
 
-const SPR='head face_normal face_dead face_hurt face_taunt skull hat_party hat_top hat_crown hat_cap hat_beanie arm_l arm_r torso leg_l leg_r gun_rocket gun_sniper gun_minigun gun_shotgun gun_pea gun_banana proj_rocket proj_bullet proj_pea proj_banana crosshair plat_thin plat_oval plat_floor crate boom_1 boom_2 boom_3 boom_4 confetti txt_bonk txt_kaboom txt_wins muzzle_1 muzzle_2 poof_1 poof_2 poof_3 splat_1 splat_2 splat_3 dust_1 dust_2 dust_3 font'.split(' ');
+const SPR='head face_normal face_dead face_hurt face_taunt skull hat_party hat_top hat_crown hat_cap hat_beanie arm_l arm_r torso leg_l leg_r gun_rocket gun_sniper gun_minigun gun_shotgun gun_pea gun_banana proj_rocket proj_bullet proj_pea proj_banana proj_pellet crosshair plat_thin plat_oval plat_floor crate boom_1 boom_2 boom_3 boom_4 confetti txt_bonk txt_kaboom txt_wins muzzle_1 muzzle_2 poof_1 poof_2 poof_3 splat_1 splat_2 splat_3 dust_1 dust_2 dust_3 font'.split(' ');
 const IMG={};for(const n of SPR){const im=new Image();im.src='assets/img/'+n+'.png';IMG[n]=im}
 let FONT=null;fetch('assets/img/font.json').then(r=>r.json()).then(j=>FONT=j).catch(()=>{});
 const ok=n=>{const im=IMG[n];return!!(im&&im.complete&&im.naturalWidth)};
@@ -118,7 +120,7 @@ function poof(x,y,col){fx(['poof_3','poof_2','poof_1'],x,y-28,34,24,{col,fade:1}
 function dust(x,y,w){fx(['dust_1','dust_2','dust_3'],x,y-6,w,15,{col:'#9aa6bd',fade:1})}
 function splat(x,y,w){fx(['splat_1','splat_2','splat_3'],x,y,w,12,{col:'#e0413a'})}
 const PARTS=['arm_l','leg_l','arm_r','leg_r','torso'],HATS=['hat_party','hat_cap','hat_top','hat_beanie'];
-const GUNSPR={p:['gun_pea',22],s:['gun_shotgun',34],m:['gun_minigun',36],r:['gun_rocket',42],b:['gun_banana',30]};
+const GUNSPR={p:['gun_pea',22],s:['gun_shotgun',34],m:['gun_minigun',36],r:['gun_rocket',42],b:['gun_banana',30],a:['gun_sniper',32],n:['gun_sniper',46]};
 
 // ---------- input ----------
 const keys={};let mouse={x:W/2,y:H/2,down:false};
@@ -234,7 +236,7 @@ function joinGame(){
   peer.on('error',e=>lobbyMsg(e.type==='peer-unavailable'?'No room with that code. Double-check it.':'Connection problem: '+e.type));
 }
 function lobbyMsg(t){document.getElementById('lmsg').textContent=t}
-function closeLobby(){document.getElementById('lobbyWrap').style.display='none';audio()}
+function closeLobby(){document.getElementById('lobbyWrap').style.display='none';audio();setTimeout(()=>sfx('fight'),500)}
 
 function quickPlay(){
   if(typeof Peer==='undefined'){lobbyMsg('Could not load the connection library. Check your internet and reload.');return}
@@ -302,10 +304,17 @@ function sendRoom(){
 function aim(){if(usingPad)return padAim;return Math.atan2(mouse.y-(me.y-28),mouse.x-me.x)}
 
 // ---------- simulation ----------
-function crateNow(){const slot=Math.floor(Date.now()/9000);const h=hashN(slot),h2=hashN(slot+77);return{slot,x:CRATE[0]=CRATES[(h*CRATES.length)|0][0],y:CRATES[(h*CRATES.length)|0][1],g:'smrbh'[(h2*5)|0]}}
+function crateNow(){const slot=Math.floor(Date.now()/9000);const h=hashN(slot),h2=hashN(slot+77);return{slot,x:CRATE[0]=CRATES[(h*CRATES.length)|0][0],y:CRATES[(h*CRATES.length)|0][1],g:'smrbhan'[(h2*7)|0]}}
 const CRATE=[0,0];
 function crateTaken(slot){if(net.tk===slot)return true;for(const r of Object.values(remotes))if(r.tk===slot)return true;return false}
 
+function fire(G,now){
+  me.burst--;me.lastShot=now;const a=aim();const mx=me.x+Math.cos(a)*24,my=me.y-28+Math.sin(a)*24;
+  const s={id:shotSeq++,x:Math.round(mx),y:Math.round(my),a:+a.toFixed(3),g:me.g,t:Date.now()};
+  net.sh.push(s);spawnShot(s,true,COLORS[myColor]);
+  me.vx-=Math.cos(a)*(G.rec||.5);if(!me.ground)me.vy-=Math.sin(a)*(G.rec||.5)*.6;
+  if(G.ammo!==Infinity&&--me.ammo<=0){me.g='p';me.ammo=Infinity;me.burst=0;say(me.x,me.y-60,'out of ammo lol','#6b7892');sfx('ammo')}
+}
 function step(){
   const now=performance.now();
   if(me.dead){if(now>me.respawnAt){respawn();poof(me.x,me.y,COLORS[myColor])}}
@@ -326,16 +335,11 @@ function step(){
     if(Math.abs(me.vx)>.5&&me.ground)me.walk+=Math.abs(me.vx)*.12;
     // shoot
     const G=GUNS[me.g];
-    if((mouse.down||keys.f||pad.fire)&&now-me.last>G.cd){
-      me.last=now;const a=aim();const mx=me.x+Math.cos(a)*24,my=me.y-28+Math.sin(a)*24;
-      const s={id:shotSeq++,x:Math.round(mx),y:Math.round(my),a:+a.toFixed(3),g:me.g,t:Date.now()};
-      net.sh.push(s);spawnShot(s,true,COLORS[myColor]);
-      me.vx-=Math.cos(a)*(G.rec||.5);if(!me.ground)me.vy-=Math.sin(a)*(G.rec||.5)*.6;
-      if(G.ammo!==Infinity&&--me.ammo<=0){me.g='p';me.ammo=Infinity;say(me.x,me.y-60,'out of ammo lol','#6b7892');sfx('ammo')}
-    }
+    if(me.burst>0){if(now-me.lastShot>=(G.bgap||0))fire(G,now)}
+    else if((mouse.down||keys.f||pad.fire)&&now-me.last>G.cd){me.last=now;me.burst=G.burst||1;fire(G,now)}
     // crate
     const c=crateNow();
-    if(!crateTaken(c.slot)&&Math.abs(me.x-c.x)<22&&Math.abs(me.y-10-c.y)<30){net.tk=c.slot;me.g=c.g;me.ammo=GUNS[c.g].ammo;sfx('pick');say(me.x,me.y-60,GUNS[c.g].name+'!','#2c9a4b')}
+    if(!crateTaken(c.slot)&&Math.abs(me.x-c.x)<22&&Math.abs(me.y-10-c.y)<30){net.tk=c.slot;me.g=c.g;me.burst=0;me.ammo=GUNS[c.g].ammo;sfx('pick');say(me.x,me.y-60,GUNS[c.g].name+'!','#2c9a4b')}
   }
   jumpPressed=false;tauntPressed=false;
   // bullets
@@ -344,7 +348,7 @@ function step(){
     b.x+=b.vx;b.y+=b.vy;b.life--;
     if(b.g==='r'&&Math.random()<.5)fx(['dust_1'],b.x,b.y,12,18,{vx:-b.vx*.1,vy:-b.vy*.1,col:'#b8bcc6',fade:1});
     let dead=b.life<=0||b.x<-50||b.x>W+50||b.y>H+50;
-    for(const p of allPlats())if(b.x>p[0]&&b.x<p[0]+p[2]&&b.y>p[1]&&b.y<p[1]+p[3]){if(GUNS[b.g].bounce){b.x-=b.vx;b.y-=b.vy;if(b.y<p[1]||b.y>p[1]+p[3])b.vy*=-.6;else b.vx*=-.7;b.vx*=.85}else dead=true;break}
+    for(const p of allPlats())if(!GUNS[b.g].pierce&&b.x>p[0]&&b.x<p[0]+p[2]&&b.y>p[1]&&b.y<p[1]+p[3]){if(GUNS[b.g].bounce){b.x-=b.vx;b.y-=b.vy;if(b.y<p[1]||b.y>p[1]+p[3])b.vy*=-.6;else b.vx*=-.7;b.vx*=.85}else dead=true;break}
     if(!dead){
       const G=GUNS[b.g];
       const targets=Object.entries(remotes).map(([pid,r])=>({pid,r}));
@@ -412,8 +416,10 @@ function draw(t){
   for(const b of bullets){const ang=Math.atan2(b.vy,b.vx);ctx.save();ctx.translate(b.x,b.y);let done=false;
     if(b.g==='r'){ctx.rotate(ang);done=spr('proj_rocket',0,0,24,0,'#e0413a')}
     else if(b.g==='b'){ctx.rotate(t*.02);done=spr('proj_banana',0,0,18,0,'#d9a400')}
-    else if(b.g==='m'){ctx.rotate(ang);done=spr('proj_bullet',0,0,11,0,b.col)}
-    else if(b.g==='p'||b.g==='s')done=spr('proj_pea',0,0,b.g==='p'?10:7,0,b.col);
+    else if(b.g==='m'||b.g==='a'){ctx.rotate(ang);done=spr('proj_bullet',0,0,11,0,b.col)}
+    else if(b.g==='n'){ctx.rotate(ang);ctx.globalAlpha*=.35;ctx.strokeStyle=b.col;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-44,0);ctx.lineTo(0,0);ctx.stroke();ctx.globalAlpha/=.35;done=spr('proj_bullet',0,0,18,0,b.col)}
+    else if(b.g==='s'){ctx.rotate(ang);done=spr('proj_pellet',0,0,9,0,b.col)}
+    else if(b.g==='p')done=spr('proj_pea',0,0,10,0,b.col);
     if(!done){ctx.strokeStyle=b.col;ctx.fillStyle=b.col;ctx.lineWidth=2;ctx.beginPath();if(b.g==='h'){ctx.rotate(ang);ctx.arc(0,0,6+(13-b.life),-.6,.6);ctx.stroke()}else{ctx.arc(0,0,3.5,0,6.28);ctx.fill()}}
     ctx.restore()}
   for(const p of parts){ctx.globalAlpha=p.t==='spr'&&!p.fade?1:Math.min(1,p.life/20);
