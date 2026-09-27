@@ -47,7 +47,7 @@
   - Rocket launcher (keep as is, same fire rate)
   - Shotgun
   - Minigun
-  - Assault rifle (NEW) — open question: fast bursts, or randomly fires on its own sometimes?
+  - Assault rifle (NEW) — fires in fast bursts (decided).
   - Sniper rifle (NEW) — shots pass through platforms
   - Banana gun (keep, but must look nothing like the rocket launcher)
   - Honk Cannon — not mentioned in new lineup; decide whether to keep it.
