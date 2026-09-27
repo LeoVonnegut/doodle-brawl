@@ -89,12 +89,12 @@ function audio(){if(!ac){try{ac=new (window.AudioContext||window.webkitAudioCont
 function tone(type,f1,f2,dur,vol=.15,delay=0){if(!ac)return;const t=ac.currentTime+delay,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(Math.max(20,f2),t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+dur+.02)}
 function noise(dur,vol=.2,lp=3000){if(!ac)return;const t=ac.currentTime,b=ac.createBuffer(1,ac.sampleRate*dur,ac.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);const s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();f.type='lowpass';f.frequency.value=lp;g.gain.value=vol;s.buffer=b;s.connect(f).connect(g).connect(ac.destination);s.start(t)}
 const CLIPS={
- jump:['assets/audio/jump_1.mp3','assets/audio/jump_2.mp3'],
- land:['assets/audio/land_1.mp3','assets/audio/land_2.mp3'],
+ jump:['assets/audio/jump_1.mp3'],
+ jump2:['assets/audio/jump2_1.mp3'],
+ land:['assets/audio/land_1.mp3'],
  pick:['assets/audio/pick_1.mp3','assets/audio/pick_2.mp3'],
  ammo:['assets/audio/ammo_1.mp3','assets/audio/ammo_2.mp3'],
- join:['assets/audio/join_1.mp3'],
- taunt:['assets/audio/taunt_1.mp3','assets/audio/taunt_2.mp3','assets/audio/taunt_3.mp3','assets/audio/taunt_4.mp3','assets/audio/taunt_5.mp3'],
+ join:['assets/audio/join_1.mp3','assets/audio/join_2.mp3','assets/audio/join_3.mp3','assets/audio/join_4.mp3','assets/audio/join_5.mp3','assets/audio/join_6.mp3'],
  fight:['assets/audio/fight_1.mp3'],
 };
 const CLIP_CACHE={};
@@ -113,7 +113,7 @@ function sfx(k,far){if(playClip(k,far))return;const v=far?.5:1;switch(k){
  case'die':tone('sine',950,140,.7,.18);tone('square',300,60,.4,.05,.3);break;
  case'pick':[523,659,784,1046].forEach((f,i)=>tone('square',f,f,.08,.06,i*.06));break;
  case'toss':tone('sine',400,900,.15,.1*v);break;
- case'honk':tone('sawtooth',230,200,.28,.16*v);tone('square',345,300,.28,.06*v);break;
+ case'taunt':case'honk':tone('sawtooth',230,200,.28,.16*v);tone('square',345,300,.28,.06*v);break;
  case'win':[523,659,784,1046,784,1046].forEach((f,i)=>tone('square',f,f,.14,.08,i*.12));break;
  case'join':[392,523].forEach((f,i)=>tone('triangle',f,f,.12,.1,i*.1));break;
 }}
@@ -337,7 +337,7 @@ function step(){
     if(tauntPressed&&now-(me.tauntAt||0)>900){me.tauntAt=now;const tx=TAUNTS[Math.random()*TAUNTS.length|0];net.tt={id:ttSeq++,txt:tx};say(me.x,me.y-80,tx,COLORS[myColor]);sfx('taunt')}
     const target=ax*5.2,k=me.ground?.25:.08;
     if(ax||me.ground)me.vx+=(target-me.vx)*k;
-    if(jumpPressed&&me.jumps>0){me.vy=-12;me.jumps--;sfx('jump');dust(me.x,me.y,30)}
+    if(jumpPressed&&me.jumps>0){me.vy=-12;me.jumps--;sfx(me.jumps?'jump':'jump2');dust(me.x,me.y,30)}
     if((keys.dn||pad.dn)&&me.ground)me.drop=10;
     me.vy=Math.min(me.vy+.6,18);
     const py=me.y;me.x+=me.vx;me.y+=me.vy;me.ground=false;if(me.drop>0)me.drop--;
