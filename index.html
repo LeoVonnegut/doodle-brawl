@@ -69,7 +69,6 @@ const PLAT=[[0,470,300,70],[660,470,300,70],[110,360,150,14],[700,360,150,14],[3
 function movX(){return 425+Math.sin(Date.now()/1700)*155}
 function allPlats(){return PLAT.concat([[movX(),440,110,14]])}
 const TARGET=5;const VERSION='1.1';
-const TAUNTS=['u smell','get bonked','skill issue','honk honk','i am speed','ez','bring snacks','my mom says im cool','catch me lol','wiggle wiggle'];
 const VERBS=['bonked','yeeted','deleted','honked','spaghettified','bamboozled','sent to the shadow realm'];
 const SPAWNS=[[90,120],[870,120],[480,200],[210,320],[740,320]];
 const CRATES=[[480,255],[100,180],[860,180],[185,340],[775,340],[385,120],[575,120]];
@@ -269,7 +268,7 @@ function readRoom(){
     let r=remotes[pid];
     if(!r){r=remotes[pid]={x:s.x,y:s.y,walk:0,fresh:true,dead:!!s.dead,ttid:s.tt?s.tt.id:0,dbPrev:Object.assign({},s.db||{})};setStatus()}
     if((s.rd|0)>net.rd){net.rd=s.rd|0;resetRound()}
-    if(s.tt&&s.tt.id!==r.ttid){r.ttid=s.tt.id;r.tauntAt=performance.now();say(r.x,r.y-80,String(s.tt.txt).slice(0,24),COLORS[s.c|0]||'#23324a');sfx('taunt',true,typeof s.tt.v==='number'?s.tt.v:-1)}
+    if(s.tt&&s.tt.id!==r.ttid){r.ttid=s.tt.id;r.tauntAt=performance.now();sfx('taunt',true,typeof s.tt.v==='number'?s.tt.v:-1)}
     if(s.db&&(s.rd|0)===net.rd){for(const k in s.db)if((+s.db[k]||0)>(+r.dbPrev[k]||0))addFeed(k==='_'?`${String(s.n||'someone').slice(0,14)} fell off the page`:`${nameOf(k)} ${VERBS[Math.random()*VERBS.length|0]} ${String(s.n||'someone').slice(0,14)}`)}
     r.dbPrev=Object.assign({},s.db||{});
     const tx=s.x+(s.vx||0)*2,ty=s.y+(s.vy||0)*2;
@@ -312,7 +311,7 @@ function step(){
   if(me.dead){if(now>me.respawnAt){respawn();poof(me.x,me.y,COLORS[myColor])}}
   else{
     const pad=pollPad()||{};let ax=(keys.r?1:0)-(keys.l?1:0);if(pad.ax)ax=pad.ax;
-    if(tauntPressed&&now-(me.tauntAt||0)>900){me.tauntAt=now;const tx=TAUNTS[Math.random()*TAUNTS.length|0];say(me.x,me.y-80,tx,COLORS[myColor]);net.tt={id:ttSeq++,txt:tx,v:sfx('taunt')}}
+    if(tauntPressed&&now-(me.tauntAt||0)>900){me.tauntAt=now;net.tt={id:ttSeq++,txt:'',v:sfx('taunt')}}
     const target=ax*5.2,k=me.ground?.25:.08;
     if(ax||me.ground)me.vx+=(target-me.vx)*k;
     if(jumpPressed&&me.jumps>0){me.vy=-12;me.jumps--;sfx(me.jumps?'jump':'jump2');dust(me.x,me.y,30)}
@@ -408,8 +407,8 @@ function draw(t){
     ctx.fillStyle='#ffd84d';ctx.fillRect(-11,-11,22,22);
     if(!spr('crate',0,0,30)){ctx.strokeStyle='#23324a';ctx.lineWidth=3;ctx.strokeRect(-13,-13,26,26);ctx.fillStyle='#23324a';ctx.font='700 24px Gaegu, cursive';ctx.textAlign='center';htxt('?',0,8)}ctx.restore()}
   const sc=scores(),lead=sc[0]&&sc[0].k>0&&(!sc[1]||sc[0].k>sc[1].k)?sc[0].pid:null;
-  for(const [pid,r] of Object.entries(remotes))if(!r.dead)stick(r.x,r.y,r.a,COLORS[r.c]||'#23324a',r.walk,r.n,r.hp,r.g,false,t,r.h,lead===pid,r.vy,r.sp,performance.now()-(r.tauntAt||0)<900);
-  if(!me.dead)stick(me.x,me.y,aim(),COLORS[myColor],me.walk,nameEl.value||'You',me.hp,me.g,true,t,myHat,lead===(myPid||'me'),me.vy,performance.now()<me.prot,performance.now()-(me.tauntAt||0)<900);
+  for(const [pid,r] of Object.entries(remotes))if(!r.dead)stick(r.x,r.y,r.a,COLORS[r.c]||'#23324a',r.walk,r.n,r.hp,r.g,false,t,r.h,lead===pid,r.vy,r.sp,performance.now()-(r.tauntAt||0)<1500);
+  if(!me.dead)stick(me.x,me.y,aim(),COLORS[myColor],me.walk,nameEl.value||'You',me.hp,me.g,true,t,myHat,lead===(myPid||'me'),me.vy,performance.now()<me.prot,performance.now()-(me.tauntAt||0)<1500);
   for(const b of bullets){const ang=Math.atan2(b.vy,b.vx);ctx.save();ctx.translate(b.x,b.y);let done=false;
     if(b.g==='r'){ctx.rotate(ang);done=spr('proj_rocket',0,0,24,0,'#e0413a')}
     else if(b.g==='b'){ctx.rotate(t*.02);done=spr('proj_banana',0,0,18,0,'#d9a400')}
