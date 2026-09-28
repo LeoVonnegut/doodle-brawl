@@ -38,20 +38,20 @@
 - Models: Sonnet for most work, Opus for hard problems, Haiku for tiny chores.
 - Real game-dev references (Sakurai's YouTube, Vlambeer's "Art of Screenshake", Duck Game, Stick Fight) are study references only, never role-played.
 
-## Next version (build ONLY when I say go)
-- Clean up fonts/text; fix scoreboard overlap ("first to 5" line collides with names).
+## Status after v1.2 (2026-09-28)
+Done:
+- All canvas art replaced with hand-drawn assets (animated rig, faces, hats, guns, effects, handwriting font).
+- All sounds replaced with voice memos (117 clips). Taunts are voice + tongue face (no text).
+- Assault Rifle (3-shot bursts) and Sniper (pierces platforms) added; banana gun has its own drawing.
+
+Still to do (build ONLY when I say go):
+- Scoreboard overlap check ("first to 5" line vs names) — box was widened, re-check in play.
 - Remove "mind the gaps" background text.
 - Fix falling at screen edges: floors must continue seamlessly through the wraparound.
-- New gun lineup:
-  - Pea Shooter (starting gun)
-  - Rocket launcher (keep as is, same fire rate)
-  - Shotgun
-  - Minigun
-  - Assault rifle (NEW) — fires in fast bursts (decided).
-  - Sniper rifle (NEW) — shots pass through platforms
-  - Banana gun (keep, but must look nothing like the rocket launcher)
-  - Honk Cannon — not mentioned in new lineup; decide whether to keep it.
-- Replace all code-drawn art and synthesized sounds with hand-drawn and recorded assets, animated where needed.
+- Honk Cannon: keep or drop? (no drawing/recording; uses pitched shotgun sound).
+- Optional: proper assault rifle drawing (currently the sniper drawing, shorter).
+- Optional: real font file (Calligraphr) so lobby/buttons use my handwriting too.
+- Later ideas: notebook-fights-back twist, killcam, save-last-15-seconds clip button.
 
 ## Drawings needed (black marker, plain white paper, numbered, 5-10 per page, photographed from straight above, good light, no shadows)
 Characters (separate parts for animation, black only, game adds player color):
