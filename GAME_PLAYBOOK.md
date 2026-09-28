@@ -11,6 +11,12 @@ Copy this file into every new game repo as `CLAUDE.md` (Claude Code reads it aut
 - On hard problems, pick the smart method first (use what's already installed, use your own eyes on images) instead of brute-forcing or installing things.
 - If I say something was sent, list exactly what arrived by name before arguing.
 
+## Safety and backups (every game)
+- Protect `main` on GitHub right after creating a repo (no force-push, no deletion): `gh api -X PUT repos/LeoVonnegut/<repo>/branches/main/protection` with allow_force_pushes=false, allow_deletions=false, enforce_admins=true.
+- Keep a second copy on the Mac: `git clone --mirror` into `~/GameBackups/<repo>.git`, refresh after pushes with `git -C ~/GameBackups/<repo>.git remote update -p`.
+- Never give the `gh` login the `delete_repo` scope. `~/.claude/settings.json` blocks destructive commands (rm -rf, force push, reset --hard, git clean, gh repo delete).
+- Tag each playable version (v0.1, v0.2, …) as a restore point. Commit + push after every finished step.
+
 ## Setup that already works on my Mac
 - `gh` (GitHub CLI) is installed and logged in as LeoVonnegut, so push with normal `git push`.
 - If a push fails with "HTTP 400", retry with `git -c http.postBuffer=524288000 push`.
