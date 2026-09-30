@@ -1,6 +1,6 @@
 # Game Playbook — lessons from Doodle Brawl
 
-Copy this file into every new game repo as `CLAUDE.md` (Claude Code reads it automatically at the start of each session), then add a section about the new game.
+Copy this file into every new game repo as `AGENTS.md` (read by both Claude Code and Codex), make `CLAUDE.md` just the line `@AGENTS.md`, then add a section about the new game. Keep AGENTS.md under 24 KB (Codex reads only 32 KB); put long history in `docs/HISTORY.md`.
 
 ## How we work
 - I'm not a programmer. Do the technical work, explain simply, keep it short.
@@ -48,3 +48,10 @@ Copy this file into every new game repo as `CLAUDE.md` (Claude Code reads it aut
 ## Vision principles (carry over)
 - Human-made everything: my drawings, my handwriting, my voice. Friends can add their own screams and taunts.
 - Aim for clip-worthy chaos: 10-second moments anyone gets instantly.
+
+## Working with two AI tools (Claude Code + Codex)
+- Claude Code is the dev lead; Codex (bundled in the ChatGPT Mac app, logged in with ChatGPT) does most of the building, so both plans' usage gets used.
+- Copy `tools/codex.sh` from farm-fighter: `tools/codex.sh <easy|normal|hard|max> <job-file> [read]` runs Codex on a job in the background (easy = gpt-6-luna, normal/hard/max = gpt-6-astra medium/high/xhigh). Its report lands in `codex-runs/` (git-ignored).
+- Codex works in the repo with no internet: it can edit and commit, the lead pushes and refreshes the backup mirror.
+- One tool edits the same files at a time. Small commits. Never put keys or tokens in files.
+- Codex's personal rules live in `~/.codex/AGENTS.md` (already set up on this Mac).
